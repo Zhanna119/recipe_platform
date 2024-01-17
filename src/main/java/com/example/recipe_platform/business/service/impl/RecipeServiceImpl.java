@@ -72,7 +72,7 @@ public class RecipeServiceImpl implements RecipeService {
         repository.deleteById(id);
     }
 
-   /* @Override
+   @Override
     public List<Recipe> findByRecipeAuthor(String author) {
         log.info("Finding recipes by author: {}", author);
         List<Recipe> recipesByAuthor = repository.findByAuthor(author)
@@ -81,5 +81,5 @@ public class RecipeServiceImpl implements RecipeService {
                 .collect(Collectors.toList());
         log.info("Found {} recipes by author: {}", recipesByAuthor.size(), author);
         return recipesByAuthor;
-    }*/
+    }
 }

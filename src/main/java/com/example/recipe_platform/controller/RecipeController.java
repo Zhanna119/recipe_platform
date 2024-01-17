@@ -93,7 +93,7 @@ public class RecipeController {
         return  ResponseEntity.ok().build();
     }
 
-    /*@GetMapping("/author/{author}")
+    @GetMapping("/author/{author}")
     public ResponseEntity<List<Recipe>> getRecipesByAuthor(@NonNull @PathVariable("author") String author) {
         List<Recipe> recipesByAuthor = service.findByRecipeAuthor(author);
         if (recipesByAuthor.isEmpty()) {
@@ -103,6 +103,6 @@ public class RecipeController {
             log.info("Recipes found for author {}, with list size: {}", author, recipesByAuthor.size());
             return ResponseEntity.ok(recipesByAuthor);
         }
-    }*/
+    }
 
 }

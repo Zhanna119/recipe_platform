@@ -11,5 +11,6 @@ public interface RecipeService {
     Optional<Recipe> editRecipe(Long id, Recipe updatedRecipe);
     Recipe saveRecipe(Recipe recipe);
     void deleteRecipeById(Long id);
-    //List<Recipe> getAllRecipesByAuthor(String author);
+
+    List<Recipe> findByRecipeAuthor(String author);
 }

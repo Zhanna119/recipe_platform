@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +40,7 @@ public class RecipeController {
         }
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Recipe> getRecipeById(
             @NonNull @PathVariable("id") Long id) {
         Optional<Recipe> recipe = service.getRecipeById(id);
@@ -69,16 +71,28 @@ public class RecipeController {
         return ResponseEntity.ok(recipeOptional.get());
     }
 
-    @PostMapping("/save")
+   /* @PostMapping("/save")
     ResponseEntity<Recipe> saveRecipe(@Valid @RequestBody Recipe recipe) {
-        Recipe data = service.saveRecipe(recipe);
-        if(service.getRecipeById(recipe.getId()).isPresent()) {
-            log.warn("Recipe with this id already exists");
+        try {
+            Recipe savedRecipe = service.saveRecipe(recipe);
+            if (savedRecipe == null) {
+                log.warn("Failed to save the recipe");
+                return ResponseEntity.unprocessableEntity().build();
+            }
+            log.info("Recipe entry saved");
+            return ResponseEntity.ok(savedRecipe);
+        } catch (IllegalArgumentException ex) {
+            log.warn("Invalid recipe: " + ex.getMessage());
             return ResponseEntity.unprocessableEntity().build();
         }
-        log.info("Recipe entry saved");
-        return ResponseEntity.ok(data);
+    }*/
+
+    @PostMapping("/save")
+    ResponseEntity<Recipe> saveRecipe(@Valid @RequestBody Recipe recipe) {
+       Recipe savedRecipe = service.saveRecipe(recipe);
+       return new ResponseEntity<>(savedRecipe, HttpStatus.CREATED);
     }
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Recipe> deleteRecipeById(

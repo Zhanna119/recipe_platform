@@ -22,7 +22,7 @@ public class RecipeDAO {
     @Column(nullable = false)
     private String instruction;
     @Column(nullable = false)
-    private String recipeAuthor;
+    private String author;
     @Column(nullable = false, unique = true)
     private String recipeAuthorEmail;
 }

@@ -13,7 +13,7 @@ public class Recipe {
     private String title;
     private String ingredients;
     private String instruction;
-    private String recipeAuthor;
+    private String author;
     private String recipeAuthorEmail;
 
 

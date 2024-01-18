@@ -1,15 +1,14 @@
 package com.example.recipe_platform.business.service.impl;
 
+import com.example.recipe_platform.business.exceptions.AuthorNotFoundException;
 import com.example.recipe_platform.business.exceptions.EmailAlreadyExistsException;
 import com.example.recipe_platform.business.exceptions.ResourceNotFoundException;
 import com.example.recipe_platform.business.mappers.RecipeMapper;
 import com.example.recipe_platform.business.repository.RecipeRepository;
-import com.example.recipe_platform.business.repository.model.RecipeDAO;
 import com.example.recipe_platform.business.service.RecipeService;
 import com.example.recipe_platform.model.Recipe;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,18 +60,15 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public Recipe saveRecipe(Recipe recipe) {
-        if (repository.existsById(recipe.getId())) {
-            log.warn("Recipe with the same id already exists");
-            throw new IllegalArgumentException("Recipe with the same id already exists");
-        }
-
         if (isEmailExisting(recipe.getEmail())) {
             log.warn("Email '{}' already exists", recipe.getId());
-            throw new EmailAlreadyExistsException("Email Already Exists for User");
+            throw new EmailAlreadyExistsException("Email Already Exists");
         }
+
         log.info("Saving new recipe entry");
         return mapper.mapFromDao(repository.save(mapper.mapToDao(recipe)));
     }
+
 
 
     @Override
@@ -95,9 +91,13 @@ public class RecipeServiceImpl implements RecipeService {
                 .stream()
                 .map(mapper::mapFromDao)
                 .collect(Collectors.toList());
+        if (recipesByAuthor.isEmpty()) {
+            throw new AuthorNotFoundException(author);
+        }
         log.info("Found {} recipes by author: {}", recipesByAuthor.size(), author);
         return recipesByAuthor;
     }
+
 
     @Override
     public boolean isEmailExisting(String email) {

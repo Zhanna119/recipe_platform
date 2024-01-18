@@ -11,7 +11,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -87,8 +86,9 @@ public class RecipeController {
     )
     @PutMapping("/edit/{id}")
     ResponseEntity<Recipe> updateRecipe(
-            @NonNull @PathVariable("id") Long id,
-            @Valid @RequestBody Recipe recipe) {
+            @PathVariable("id") Long id,
+            @RequestBody @Valid Recipe recipe) {
+        recipe.setId(id);
         if(!recipe.getId().equals(id)) {
             log.warn("Given id {} does not match the request body or does not exists", id);
             return ResponseEntity.badRequest().build();
@@ -101,22 +101,6 @@ public class RecipeController {
         log.info("Recipe with id {} updated", id);
         return ResponseEntity.ok(recipeOptional.get());
     }
-
-   /* @PostMapping("/save")
-    ResponseEntity<Recipe> saveRecipe(@Valid @RequestBody Recipe recipe) {
-        try {
-            Recipe savedRecipe = service.saveRecipe(recipe);
-            if (savedRecipe == null) {
-                log.warn("Failed to save the recipe");
-                return ResponseEntity.unprocessableEntity().build();
-            }
-            log.info("Recipe entry saved");
-            return ResponseEntity.ok(savedRecipe);
-        } catch (IllegalArgumentException ex) {
-            log.warn("Invalid recipe: " + ex.getMessage());
-            return ResponseEntity.unprocessableEntity().build();
-        }
-    }*/
 
     @Operation(
             summary = "Create Recipe REST API",

@@ -1,5 +1,7 @@
 package com.example.recipe_platform.business.service.impl;
 
+import com.example.recipe_platform.business.exceptions.EmailAlreadyExistsException;
+import com.example.recipe_platform.business.exceptions.ResourceNotFoundException;
 import com.example.recipe_platform.business.mappers.RecipeMapper;
 import com.example.recipe_platform.business.repository.RecipeRepository;
 import com.example.recipe_platform.business.repository.model.RecipeDAO;
@@ -7,6 +9,7 @@ import com.example.recipe_platform.business.service.RecipeService;
 import com.example.recipe_platform.model.Recipe;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,10 +40,12 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public Optional<Recipe> getRecipeById(Long id) {
         log.info("Looking for recipe with id {}", id);
-        return repository
+        return Optional.ofNullable(repository
                 .findById(id)
-                .flatMap(loan -> Optional.ofNullable(mapper.mapFromDao(loan)));
+                .flatMap(loan -> Optional.ofNullable(mapper.mapFromDao(loan)))
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe", "id", id)));
     }
+
 
     @Override
     public Optional<Recipe> editRecipe(Long id, Recipe updatedRecipe) {
@@ -48,31 +53,42 @@ public class RecipeServiceImpl implements RecipeService {
         if(repository.existsById(id)){
             log.info("Recipe entry with id {} is updated", id);
             return Optional.ofNullable(mapper.mapFromDao(repository.save(mapper.mapToDao(updatedRecipe))));
+        } else {
+            log.warn("Recipe entry with id {} is not updated", id);
+            throw new ResourceNotFoundException("Recipe", "id", id);
         }
-        log.warn("Recipe entry with id {} is not updated", id);
-        return Optional.empty();
     }
 
     @Override
     public Recipe saveRecipe(Recipe recipe) {
-        List<RecipeDAO> existingRecipes = repository.findAll();
-        for (RecipeDAO existingRecipe : existingRecipes) {
-            if (existingRecipe.getId().equals(recipe.getId())) {
-                log.warn("Recipe with the same id already exists");
-                throw new IllegalArgumentException("Recipe with the same id already exists");
-            }
+        if (repository.existsById(recipe.getId())) {
+            log.warn("Recipe with the same id already exists");
+            throw new IllegalArgumentException("Recipe with the same id already exists");
+        }
+
+        if (isEmailExisting(recipe.getEmail())) {
+            log.warn("Email '{}' already exists", recipe.getId());
+            throw new EmailAlreadyExistsException("Email Already Exists for User");
         }
         log.info("Saving new recipe entry");
         return mapper.mapFromDao(repository.save(mapper.mapToDao(recipe)));
     }
 
+
     @Override
     public void deleteRecipeById(Long id) {
         log.info("Deleting recipe with id {}", id);
-        repository.deleteById(id);
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+            log.info("Recipe with id {} deleted successfully", id);
+        } else {
+            log.warn("Recipe with id {} not found for deletion", id);
+            throw new ResourceNotFoundException("Recipe", "id", id);
+        }
     }
 
-   @Override
+
+    @Override
     public List<Recipe> findByRecipeAuthor(String author) {
         log.info("Finding recipes by author: {}", author);
         List<Recipe> recipesByAuthor = repository.findByAuthor(author)
@@ -82,4 +98,13 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("Found {} recipes by author: {}", recipesByAuthor.size(), author);
         return recipesByAuthor;
     }
+
+    @Override
+    public boolean isEmailExisting(String email) {
+        boolean emailExists = repository.existsByEmail(email);
+        log.info("Email '{}' exists in database: {}", email, emailExists);
+        return emailExists;
+    }
+
+
 }

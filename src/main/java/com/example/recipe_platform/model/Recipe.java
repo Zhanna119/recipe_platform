@@ -33,7 +33,7 @@ public class Recipe {
     @Schema(
             description = "Recipe Author Email"
     )
-    private String recipeAuthorEmail;
+    private String email;
 
 
 }

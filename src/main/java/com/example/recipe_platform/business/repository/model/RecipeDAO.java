@@ -24,5 +24,5 @@ public class RecipeDAO {
     @Column(nullable = false)
     private String author;
     @Column(nullable = false, unique = true)
-    private String recipeAuthorEmail;
+    private String email;
 }

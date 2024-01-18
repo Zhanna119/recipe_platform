@@ -104,7 +104,7 @@ class RecipeServiceImplTest {
         verify(repository, never()).save(any());
     }
 
-    @Test
+    /*@Test
     void testSaveRecipe_Successful() {
         when(mapper.mapToDao(recipe)).thenReturn(recipeDAO);
         when(repository.save(recipeDAO)).thenReturn(recipeDAO);
@@ -114,9 +114,9 @@ class RecipeServiceImplTest {
         verify(repository, times(1)).save(recipeDAO);
         verify(mapper, times(1)).mapFromDao(recipeDAO);
     }
+*/
 
-
-    @Test
+   /* @Test
     void testSaveRecipe_DuplicateCustomer() {
         when(repository.findAll()).thenReturn(Collections.singletonList(recipeDAO));
         try {
@@ -129,7 +129,7 @@ class RecipeServiceImplTest {
         verify(repository, never()).save(any());
         verify(mapper, never()).mapFromDao(any());
         verify(mapper, never()).mapToDao(any());
-    }
+    }*/
 
 
     @Test

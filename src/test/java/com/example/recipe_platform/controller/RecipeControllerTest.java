@@ -66,13 +66,13 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$[0].ingredients").value(is(mockedData.get(0).getIngredients())))
                 .andExpect(jsonPath("$[0].instruction").value(is(mockedData.get(0).getInstruction())))
                 .andExpect(jsonPath("$[0].author").value(is(mockedData.get(0).getAuthor())))
-                .andExpect(jsonPath("$[0].recipeAuthorEmail").value(is(mockedData.get(0).getRecipeAuthorEmail())))
+                .andExpect(jsonPath("$[0].email").value(is(mockedData.get(0).getEmail())))
                 .andExpect(jsonPath("$[1].id").value(is(mockedData.get(1).getId().intValue())))
                 .andExpect(jsonPath("$[1].title").value(is(mockedData.get(1).getTitle())))
                 .andExpect(jsonPath("$[1].ingredients").value(is(mockedData.get(1).getIngredients())))
                 .andExpect(jsonPath("$[1].instruction").value(is(mockedData.get(1).getInstruction())))
                 .andExpect(jsonPath("$[1].author").value(is(mockedData.get(1).getAuthor())))
-                .andExpect(jsonPath("$[1].recipeAuthorEmail").value(is(mockedData.get(1).getRecipeAuthorEmail())));
+                .andExpect(jsonPath("$[1].email").value(is(mockedData.get(1).getEmail())));
         verify(service, times(1)).getAllRecipes();
     }
 
@@ -97,7 +97,7 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.ingredients", is("ingredients")))
                 .andExpect(jsonPath("$.instruction", is("instruction")))
                 .andExpect(jsonPath("$.author", is("author")))
-                .andExpect(jsonPath("$.recipeAuthorEmail", is("email")));
+                .andExpect(jsonPath("$.email", is("email")));
                 verify(service, times(1)).getRecipeById(1L);
     }
 
@@ -123,7 +123,7 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.ingredients", is("ingredients")))
                 .andExpect(jsonPath("$.instruction", is("instruction")))
                 .andExpect(jsonPath("$.author", is("author")))
-                .andExpect(jsonPath("$.recipeAuthorEmail", is("email")));
+                .andExpect(jsonPath("$.email", is("email")));
         verify(service, times(1)).saveRecipe(recipe);
     }
 
@@ -151,7 +151,7 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.ingredients", is("ingredients")))
                 .andExpect(jsonPath("$.instruction", is("instruction")))
                 .andExpect(jsonPath("$.author", is("author")))
-                .andExpect(jsonPath("$.recipeAuthorEmail", is("email")));
+                .andExpect(jsonPath("$.email", is("email")));
         verify(service, times(1)).editRecipe(1L, recipe);
     }
 
@@ -222,13 +222,13 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$[0].ingredients").value(is(mockedData.get(0).getIngredients())))
                 .andExpect(jsonPath("$[0].instruction").value(is(mockedData.get(0).getInstruction())))
                 .andExpect(jsonPath("$[0].author").value(is(mockedData.get(0).getAuthor())))
-                .andExpect(jsonPath("$[0].recipeAuthorEmail").value(is(mockedData.get(0).getRecipeAuthorEmail())))
+                .andExpect(jsonPath("$[0].email").value(is(mockedData.get(0).getEmail())))
                 .andExpect(jsonPath("$[1].id").value(is(mockedData.get(1).getId().intValue())))
                 .andExpect(jsonPath("$[1].title").value(is(mockedData.get(1).getTitle())))
                 .andExpect(jsonPath("$[1].ingredients").value(is(mockedData.get(1).getIngredients())))
                 .andExpect(jsonPath("$[1].instruction").value(is(mockedData.get(1).getInstruction())))
                 .andExpect(jsonPath("$[1].author").value(is(mockedData.get(1).getAuthor())))
-                .andExpect(jsonPath("$[1].recipeAuthorEmail").value(is(mockedData.get(1).getRecipeAuthorEmail())));
+                .andExpect(jsonPath("$[1].email").value(is(mockedData.get(1).getEmail())));
                 verify(service, times(1)).findByRecipeAuthor(author);
     }
 

@@ -1,7 +1,6 @@
 package com.example.recipe_platform.business.service.impl;
 
 import com.example.recipe_platform.business.exceptions.AuthorNotFoundException;
-import com.example.recipe_platform.business.exceptions.EmailAlreadyExistsException;
 import com.example.recipe_platform.business.exceptions.ResourceNotFoundException;
 import com.example.recipe_platform.business.mappers.RecipeMapper;
 import com.example.recipe_platform.business.repository.RecipeRepository;
@@ -36,13 +35,14 @@ public class RecipeServiceImpl implements RecipeService {
         return listOfDao;
     }
 
+
     @Override
     public Optional<Recipe> getRecipeById(Long id) {
         log.info("Looking for recipe with id {}", id);
-        return Optional.ofNullable(repository
+        return repository
                 .findById(id)
-                .flatMap(loan -> Optional.ofNullable(mapper.mapFromDao(loan)))
-                .orElseThrow(() -> new ResourceNotFoundException("Recipe", "id", id)));
+                .map(recipe -> Optional.ofNullable(mapper.mapFromDao(recipe)))
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe", "id", id));
     }
 
 
@@ -60,15 +60,9 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public Recipe saveRecipe(Recipe recipe) {
-        if (isEmailExisting(recipe.getEmail())) {
-            log.warn("Email '{}' already exists", recipe.getId());
-            throw new EmailAlreadyExistsException("Email Already Exists");
-        }
-
         log.info("Saving new recipe entry");
         return mapper.mapFromDao(repository.save(mapper.mapToDao(recipe)));
     }
-
 
 
     @Override
@@ -99,12 +93,12 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
 
-    @Override
+    /*@Override
     public boolean isEmailExisting(String email) {
         boolean emailExists = repository.existsByEmail(email);
         log.info("Email '{}' exists in database: {}", email, emailExists);
         return emailExists;
-    }
+    }*/
 
 
 }

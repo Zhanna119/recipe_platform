@@ -1,5 +1,7 @@
 package com.example.recipe_platform.business.service.impl;
 
+import com.example.recipe_platform.business.exceptions.AuthorNotFoundException;
+import com.example.recipe_platform.business.exceptions.ResourceNotFoundException;
 import com.example.recipe_platform.business.mappers.RecipeMapper;
 import com.example.recipe_platform.business.repository.RecipeRepository;
 import com.example.recipe_platform.business.repository.model.RecipeDAO;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,20 +66,21 @@ class RecipeServiceImplTest {
 
     @Test
     void testGetRecipeById_Successful() {
-        when(repository.findById(1L)).thenReturn(Optional.of(recipeDAO));
+        long id = 1L;
+        when(repository.findById(id)).thenReturn(Optional.of(recipeDAO));
         when(mapper.mapFromDao(recipeDAO)).thenReturn(recipe);
-        Optional<Recipe> actualResult = service.getRecipeById(recipe.getId());
-        assertTrue(actualResult.isPresent());
-        assertEquals(recipe, actualResult.get());
-        verify(repository, times(1)).findById(1L);
+        Optional<Recipe> actualResult = service.getRecipeById(id);
+        assertTrue(actualResult.isPresent(), "Expected to find a recipe with ID " + id);
+        assertEquals(recipe, actualResult.get(), "Retrieved recipe does not match the expected one");
+        verify(repository, times(1)).findById(id);
     }
 
     @Test
-    void testGetRecipeById_NotExistingId() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
-        Optional<Recipe> result = service.getRecipeById(99L);
-        assertFalse(result.isPresent());
-        verify(repository, times(1)).findById(anyLong());
+    void testGetRecipeById_NotFound() {
+        long nonExistingId = 99L;
+        when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> service.getRecipeById(nonExistingId));
+        verify(repository, times(1)).findById(nonExistingId);
     }
 
 
@@ -94,17 +98,20 @@ class RecipeServiceImplTest {
         verify(mapper, times(1)).mapFromDao(oldRecipeDAOEntry);
     }
 
-
     @Test
-    void testEditRecipe_NotExistingId() {
-        when(repository.existsById(99L)).thenReturn(false);
-        Optional<Recipe> result = service.editRecipe(99L, recipe);
-        assertFalse(result.isPresent());
-        verify(repository, times(1)).existsById(99L);
+    void testEditRecipe_NotFound() {
+        long nonExistingId = 99L;
+        when(repository.existsById(nonExistingId)).thenReturn(false);
+        assertThrows(ResourceNotFoundException.class, () -> service.editRecipe(nonExistingId, recipe),
+                "Expected ResourceNotFoundException for non-existing ID " + nonExistingId);
+        verify(repository, times(1)).existsById(nonExistingId);
         verify(repository, never()).save(any());
+        verify(mapper, never()).mapToDao(any());
+        verify(mapper, never()).mapFromDao(any());
     }
 
-    /*@Test
+
+    @Test
     void testSaveRecipe_Successful() {
         when(mapper.mapToDao(recipe)).thenReturn(recipeDAO);
         when(repository.save(recipeDAO)).thenReturn(recipeDAO);
@@ -113,36 +120,36 @@ class RecipeServiceImplTest {
         verify(mapper, times(1)).mapToDao(recipe);
         verify(repository, times(1)).save(recipeDAO);
         verify(mapper, times(1)).mapFromDao(recipeDAO);
+        assertEquals(recipe, savedRecipe);
     }
-*/
 
-   /* @Test
-    void testSaveRecipe_DuplicateCustomer() {
-        when(repository.findAll()).thenReturn(Collections.singletonList(recipeDAO));
-        try {
-            service.saveRecipe(recipe);
-            fail("Expected IllegalArgumentException to be thrown, but nothing was thrown.");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Recipe with the same id already exists", e.getMessage());
-        }
-        verify(repository, times(1)).findAll();
-        verify(repository, never()).save(any());
+    @Test
+    void testSaveRecipe_SaveException() {
+        when(mapper.mapToDao(recipe)).thenReturn(recipeDAO);
+        when(repository.save(recipeDAO)).thenThrow(DataIntegrityViolationException.class);
+        assertThrows(DataIntegrityViolationException.class, () -> service.saveRecipe(recipe),
+                "Expected DataIntegrityViolationException when saving the recipe");
+        verify(mapper, times(1)).mapToDao(recipe);
+        verify(repository, times(1)).save(recipeDAO);
         verify(mapper, never()).mapFromDao(any());
-        verify(mapper, never()).mapToDao(any());
-    }*/
+    }
+
 
 
     @Test
     void testDeleteRecipeById_Successful() {
-        service.deleteRecipeById(1L);
-        verify(repository, times(1)).deleteById(1L);
+        long existingId = 1L;
+        when(repository.existsById(existingId)).thenReturn(true);
+        service.deleteRecipeById(existingId);
+        verify(repository, times(1)).deleteById(existingId);
     }
 
     @Test
-    void testDeleteRecipeById_NonExistentCustomer() {
-        doNothing().when(repository).deleteById(anyLong());
-        service.deleteRecipeById(99L);
-        verify(repository, times(1)).deleteById(99L);
+    void testDeleteRecipeById_NonExistentRecipe() {
+        long nonExistingId = 99L;
+        when(repository.existsById(nonExistingId)).thenReturn(false);
+        assertThrows(ResourceNotFoundException.class, () -> service.deleteRecipeById(nonExistingId));
+        verify(repository, never()).deleteById(nonExistingId);
     }
 
     @Test
@@ -159,13 +166,14 @@ class RecipeServiceImplTest {
 
     @Test
     void testFindByRecipeAuthor_NoRecipesFound() {
-        String author = "nonexistentAuthor";
-        when(repository.findByAuthor(author)).thenReturn(Collections.emptyList());
-        List<Recipe> result = service.findByRecipeAuthor(author);
-        assertTrue(result.isEmpty());
-        verify(repository, times(1)).findByAuthor(author);
+        String nonExistingAuthor = "nonexistentAuthor";
+        when(repository.findByAuthor(nonExistingAuthor)).thenReturn(Collections.emptyList());
+        assertThrows(AuthorNotFoundException.class, () -> service.findByRecipeAuthor(nonExistingAuthor),
+                "Expected AuthorNotFoundException for non-existing author " + nonExistingAuthor);
+        verify(repository, times(1)).findByAuthor(nonExistingAuthor);
         verify(mapper, never()).mapFromDao(any());
     }
+
 
     private List<RecipeDAO> createRecipeDAOList(RecipeDAO recipeDAO) {
         List<RecipeDAO> list = new ArrayList<>();

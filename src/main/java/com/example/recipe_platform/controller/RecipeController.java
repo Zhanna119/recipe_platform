@@ -165,5 +165,4 @@ public class RecipeController {
             return ResponseEntity.ok(recipesByAuthor);
         }
     }
-
 }

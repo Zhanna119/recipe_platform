@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @OpenAPIDefinition(info = @Info(
 		title = "Spring Boot REST API Documentation",
-		description = "Spring Boot REST API Documentation",
+		description = "Spring Boot REST API Documentation for Recipe Platform",
 		contact = @Contact(
 				name = "Zanna",
 				email = "petraa@inbox.lv"

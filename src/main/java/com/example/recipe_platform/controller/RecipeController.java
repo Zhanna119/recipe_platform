@@ -5,6 +5,7 @@ import com.example.recipe_platform.business.service.RecipeService;
 import com.example.recipe_platform.model.Recipe;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.NonNull;
@@ -38,10 +39,11 @@ public class RecipeController {
             summary = "Get All Recipes REST API",
             description = "Get All Recipe REST API is used to get all recipes from the database"
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "HTTP Status 200 SUCCESS"
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of recipes"),
+            @ApiResponse(responseCode = "404", description = "Recipe list is not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/all")
     public ResponseEntity<List<Recipe>> getAllRecipes() {
         List<Recipe> list = service.getAllRecipes();
@@ -58,10 +60,11 @@ public class RecipeController {
             summary = "Get Recipe REST API",
             description = "Get Recipe by ID REST API is used to get recipe from the database"
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "HTTP Status 200 SUCCESS"
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the recipe by ID"),
+            @ApiResponse(responseCode = "404", description = "Recipe with the specified ID is not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Recipe> getRecipeById(
             @NonNull @PathVariable("id") Long id) {
@@ -80,10 +83,12 @@ public class RecipeController {
             summary = "Update Recipe REST API",
             description = "Update Recipe REST API is used to update recipe in the database"
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "HTTP Status 200 SUCCESS"
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated the recipe"),
+            @ApiResponse(responseCode = "400", description = "Bad request: Given ID does not match the request body or does not exist"),
+            @ApiResponse(responseCode = "404", description = "Recipe with the specified ID is not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PutMapping("/edit/{id}")
     ResponseEntity<Recipe> updateRecipe(
             @PathVariable("id") Long id,
@@ -106,10 +111,11 @@ public class RecipeController {
             summary = "Create Recipe REST API",
             description = "Create Recipe REST API is used to save recipe in a database"
     )
-    @ApiResponse(
-            responseCode = "201",
-            description = "HTTP Status 201 CREATED"
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created the recipe"),
+            @ApiResponse(responseCode = "400", description = "Bad request: Invalid input in the request body"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/save")
     ResponseEntity<Recipe> saveRecipe(@Valid @RequestBody Recipe recipe) {
        Recipe savedRecipe = service.saveRecipe(recipe);
@@ -121,10 +127,11 @@ public class RecipeController {
             summary = "Delete Recipe REST API",
             description = "Delete Recipe REST API is used to delete recipe from the database"
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "HTTP Status 201 SUCCESS"
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted the recipe"),
+            @ApiResponse(responseCode = "400", description = "Bad request: Recipe with the specified ID is not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Recipe> deleteRecipeById(
             @NonNull @PathVariable("id") Long id) {
@@ -142,10 +149,11 @@ public class RecipeController {
             summary = "Get Recipes by Author REST API",
             description = "Get Recipes by Author REST API is used to get all author recipes from the database"
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "HTTP Status 201 SUCCESS"
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved recipes by author"),
+            @ApiResponse(responseCode = "404", description = "No recipes found for the specified author"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/author/{author}")
     public ResponseEntity<List<Recipe>> getRecipesByAuthor(@NonNull @PathVariable("author") String author) {
         List<Recipe> recipesByAuthor = service.findByRecipeAuthor(author);

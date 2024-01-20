@@ -33,5 +33,4 @@ public class Recipe {
     @Email(message = "Email address should be valid")
     private String email;
 
-
 }

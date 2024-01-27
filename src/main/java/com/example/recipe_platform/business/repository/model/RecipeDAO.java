@@ -28,6 +28,6 @@ public class RecipeDAO {
     private String instruction;
     @Column(nullable = false)
     private String author;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 }

@@ -34,7 +34,6 @@ public class RecipeController {
         this.repository = repository;
     }
 
-
     @Operation(
             summary = "Get All Recipes REST API",
             description = "Get All Recipe REST API is used to get all recipes from the database"

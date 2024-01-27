@@ -91,14 +91,4 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("Found {} recipes by author: {}", recipesByAuthor.size(), author);
         return recipesByAuthor;
     }
-
-
-    /*@Override
-    public boolean isEmailExisting(String email) {
-        boolean emailExists = repository.existsByEmail(email);
-        log.info("Email '{}' exists in database: {}", email, emailExists);
-        return emailExists;
-    }*/
-
-
 }

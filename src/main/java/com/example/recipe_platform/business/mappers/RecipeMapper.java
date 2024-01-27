@@ -7,7 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface RecipeMapper {
     Recipe mapFromDao(RecipeDAO recipeDAO);
-
     RecipeDAO mapToDao(Recipe recipe);
 
 }

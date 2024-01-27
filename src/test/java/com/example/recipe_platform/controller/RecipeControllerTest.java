@@ -58,6 +58,7 @@ class RecipeControllerTest {
         mockedData = createMockedListRecipe();
     }
 
+
     @Test
     void testGetAllRecipes_Successful() throws Exception {
         when(service.getAllRecipes()).thenReturn(mockedData);
@@ -118,6 +119,38 @@ class RecipeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(recipe)))
                 .andExpect(status().isBadRequest());
+        verify(service, times(0)).editRecipe(anyLong(), any());
+    }
+
+    @Test
+    void testUpdateRecipe_Successful() throws Exception {
+        Recipe updatedRecipe = new Recipe(1L, "Updated Title", "Updated Ingredients",
+                "Updated Instruction", "Updated Author", "updated@email.com");
+        when(service.editRecipe(eq(1L), any(Recipe.class))).thenReturn(Optional.of(updatedRecipe));
+        ResultActions resultActions = mockMvc.perform(put(URL3 + "/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedRecipe)));
+        resultActions.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.title", is(updatedRecipe.getTitle())))
+                .andExpect(jsonPath("$.ingredients", is(updatedRecipe.getIngredients())))
+                .andExpect(jsonPath("$.instruction", is(updatedRecipe.getInstruction())))
+                .andExpect(jsonPath("$.author", is(updatedRecipe.getAuthor())))
+                .andExpect(jsonPath("$.email", is(updatedRecipe.getEmail())));
+        verify(service).editRecipe(eq(1L), any(Recipe.class));
+    }
+
+    @Test
+    void testUpdateRecipe_InvalidIdMismatch() throws Exception {
+        Recipe recipe = new Recipe();
+        recipe.setId(2L);
+
+        mockMvc.perform(put(URL3 + "/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(recipe)))
+                .andExpect(status().isBadRequest());
+
         verify(service, times(0)).editRecipe(anyLong(), any());
     }
 
@@ -206,25 +239,6 @@ class RecipeControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(service, times(1)).findByRecipeAuthor(author);
-    }
-
-    @Test
-    void testUpdateRecipe_Successful() throws Exception {
-        Recipe updatedRecipe = new Recipe(1L, "Updated Title", "Updated Ingredients",
-                "Updated Instruction", "Updated Author", "updated@email.com");
-        when(service.editRecipe(eq(1L), any(Recipe.class))).thenReturn(Optional.of(updatedRecipe));
-        ResultActions resultActions = mockMvc.perform(put(URL3 + "/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedRecipe)));
-        resultActions.andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.title", is(updatedRecipe.getTitle())))
-                .andExpect(jsonPath("$.ingredients", is(updatedRecipe.getIngredients())))
-                .andExpect(jsonPath("$.instruction", is(updatedRecipe.getInstruction())))
-                .andExpect(jsonPath("$.author", is(updatedRecipe.getAuthor())))
-                .andExpect(jsonPath("$.email", is(updatedRecipe.getEmail())));
-        verify(service).editRecipe(eq(1L), any(Recipe.class));
     }
 
     private List<Recipe> createMockedListRecipe() {

@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class RecipeControllerIT {
+class RecipeControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
@@ -27,7 +27,7 @@ public class RecipeControllerIT {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testGetAllRecipes() throws Exception {
+    void testGetAllRecipes() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/recipes/all"))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -53,5 +53,4 @@ public class RecipeControllerIT {
                 .andExpect(jsonPath("$[0].ingredients").value("ingredients1"))
                 .andExpect(jsonPath("$[1].ingredients").value("ingredients2"));
     }
-
 }

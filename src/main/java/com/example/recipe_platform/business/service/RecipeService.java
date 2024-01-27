@@ -12,5 +12,4 @@ public interface RecipeService {
     Recipe saveRecipe(Recipe recipe);
     void deleteRecipeById(Long id);
     List<Recipe> findByRecipeAuthor(String author);
-    //boolean isEmailExisting(String email);
 }

@@ -10,5 +10,4 @@ import java.util.List;
 public interface RecipeRepository extends JpaRepository<RecipeDAO, Long> {
 
     List<RecipeDAO> findByAuthor(String author);
-    boolean existsByEmail(String email);
 }

@@ -32,5 +32,4 @@ public class Recipe {
     @NotEmpty(message = "Recipe author email should not be null or empty")
     @Email(message = "Email address should be valid")
     private String email;
-
 }
